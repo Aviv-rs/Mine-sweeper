@@ -1,0 +1,198 @@
+@font-face {
+  font-family: retro;
+  src: url(../fonts/Retro.ttf);
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  background-color: rgb(255, 255, 255);
+  text-align: center;
+  font-family: retro;
+  background-image: url("../images/grey-bg.jpg");
+  height: 100%;
+}
+
+h1 {
+  margin-top: 0;
+  background: -webkit-linear-gradient(#fdd835 40%, #ff3c00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 3px 3px #ce42179d;
+  background-clip: text;
+}
+
+h2 {
+  background: -webkit-linear-gradient(#fdd835 35%, #ff3c00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 3px 3px #ce42179d;
+  background-clip: text;
+}
+
+.torch {
+  position: absolute;
+  left: 80%;
+}
+.torch2 {
+  position: absolute;
+  right: 80%;
+}
+
+h1 img {
+  width: 40px;
+}
+
+.board-container {
+  width: fit-content;
+  margin: 20px auto;
+  border: 3px solid #6b7072;
+  background-color: #c7ced4;
+}
+
+table {
+  margin: 0;
+}
+
+.cell {
+  margin: 0;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  font-size: 20px;
+  background-color: #c7ced4;
+  box-shadow: 3px 3px #606364;
+  border: 1px solid #000;
+  color: #f00;
+}
+
+.hit {
+  background-color: #9ba6af;
+  box-shadow: 0px 0px 10px inset #000;
+}
+
+.mine img {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-lvl {
+  font-family: retro;
+  border: none;
+  opacity: 0.6;
+  transition: 0.3s;
+  background-color: #c7ced4;
+  box-shadow: 0px 9px #606364;
+  font-size: 15px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.flag-count {
+  background-color: #000000c5;
+  border: solid 1px rgb(255, 255, 255);
+  border-style: groove;
+  box-shadow: 0px 9px #606364;
+  font-size: 30px;
+  font-family: monospace;
+  color: #f00;
+  text-shadow: 0px 0px 5px #f00, 0px 0px 10px #f00;
+  margin-left: 10px;
+}
+
+.btn-new {
+  background-color: #c7ced4;
+  box-shadow: 0px 9px #606364;
+  font-size: 25px;
+  padding: 10px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.btn-new:active {
+  background-color: #c7ced4;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.timer {
+  background-color: #000000c5;
+  border: solid 1px rgb(255, 255, 255);
+  border-style: groove;
+  box-shadow: 0px 9px #606364;
+  font-size: 25px;
+  font-family: monospace;
+  padding: 10px;
+  color: #f00;
+  text-shadow: 0px 0px 5px #f00, 0px 0px 10px #f00;
+  margin-left: 10px;
+}
+.btn-lvl:hover {
+  opacity: 1;
+}
+
+.btn-lvl:active {
+  background-color: #c7ced4;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.ui {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.lives {
+  width: fit-content;
+  font-size: 30px;
+}
+
+.heart-container {
+  display: inline-block;
+  width: 35px;
+  height: 30px;
+  margin-left: 5px;
+  transition: 1s;
+}
+
+.heart {
+  display: block;
+  width: 5px;
+  height: 5px;
+  background-color: rgb(20, 17, 17);
+  margin-left: 5px;
+
+  box-shadow: -5px 5px rgb(20, 17, 17), -5px 10px rgb(20, 17, 17),
+    0px 5px rgb(245, 99, 99), 0px 10px rgb(241, 47, 47),
+    0px 15px rgb(20, 17, 17), 5px 0 rgb(20, 17, 17), 5px 5px rgb(243, 61, 61),
+    5px 10px rgb(235, 26, 26), 5px 15px rgb(218, 3, 3), 5px 20px rgb(20, 17, 17),
+    10px 5px rgb(20, 17, 17), 10px 10px rgb(218, 3, 3), 10px 15px rgb(196, 3, 3),
+    10px 20px rgb(136, 3, 3), 10px 25px rgb(20, 17, 17), 15px 0 rgb(20, 17, 17),
+    15px 5px rgb(218, 3, 3), 15px 10px rgb(196, 3, 3), 15px 15px rgb(136, 3, 3),
+    15px 20px rgb(20, 17, 17), 20px 0 rgb(20, 17, 17), 20px 5px rgb(196, 3, 3),
+    20px 10px rgb(136, 3, 3), 20px 15px rgb(20, 17, 17),
+    25px 10px rgb(20, 17, 17), 25px 5px rgb(20, 17, 17);
+}
+
+.popped {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: 0.5s;
+}
+
+.best-time {
+  margin-left: 25px;
+  padding: 7px;
+  background-image: url("../images/best-time.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+footer {
+  font-size: small;
+  width: fit-content;
+  margin: auto;
+}
