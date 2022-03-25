@@ -5,11 +5,11 @@ const elLives = document.querySelector('.lives');
 const flagSound = new Audio('sounds/flag-sound.wav');
 const flagUnmarkSound = new Audio('sounds/flag-sound2.wav');
 const elBestTime = document.querySelector('.best-time');
+const elCheckBox = document.querySelector('.lives input');
 
 var elTimer;
 var gBoard;
 var gTimerInterval;
-var gStartTime;
 var gBestTime;
 
 var gGame = {
@@ -31,11 +31,10 @@ function init() {
     secsPassed: 0,
     lifeCount: gLevel.mineCount < 3 ? gLevel.mineCount : 3,
   };
-  displayBestTime();
-  const elCheckBox = document.querySelector('.lives input');
-  toggleLives(elCheckBox);
   elTimer = document.querySelector('.timer');
   elTimer.innerText = '00:00 ';
+  displayBestTime();
+  toggleLives(elCheckBox);
   if (gTimerInterval) pauseWatch();
   gTimerInterval = null;
   document.querySelector('.btn-new').innerText = '🙂';
@@ -63,7 +62,7 @@ function createBoard(size) {
 }
 
 function renderBoard(board, selector) {
-  var strHTML = `<table><tbody> <tr style ="padding:400px"> <th  colspan="${board[0].length}"  >  <button onclick="init()"  class="btn-new">🙂</button>  </th>  </tr>`;
+  var strHTML = ` <table><tbody> <tr> <th  colspan="${board[0].length}"  >  <button onclick="init()"  class="btn-new">🙂</button>  </th>  </tr>`;
   for (var i = 0; i < board.length; i++) {
     strHTML += '<tr>';
     for (var j = 0; j < board[0].length; j++) {
@@ -110,7 +109,7 @@ function setMineAroundCount(cellI, cellJ, board) {
 function cellMarked(ev, elCell, i, j) {
   ev.preventDefault();
   var cell = gBoard[i][j];
-  if (!gGame.isOn && !gGame.shownCount) gGame.isOn = true;
+  if (!gGame.shownCount) gGame.isOn = true;
   if (cell.isShown || !gGame.isOn) return;
   if (!gTimerInterval) startWatch(elTimer);
 
@@ -130,15 +129,14 @@ function cellMarked(ev, elCell, i, j) {
 
 function cellClicked(elCell, i, j) {
   var cell = gBoard[i][j];
-  if (!gGame.isOn && !gGame.shownCount) gGame.isOn = true;
-  if (cell.isMarked || !gGame.isOn) return;
-  if (!gTimerInterval) {
-    startWatch(elTimer);
-  }
   if (!gGame.shownCount) {
+    gGame.isOn = true;
     placeMines(gBoard, gLevel.mineCount, cell);
     setMinesNegsCount(gBoard);
   }
+  if (cell.isMarked || !gGame.isOn || cell.isShown) return;
+  if (!gTimerInterval) startWatch(elTimer);
+
   showCell(cell, elCell);
   if (cell.isMine) {
     renderCell({ i, j }, MINE);
@@ -156,7 +154,7 @@ function cellClicked(elCell, i, j) {
 }
 
 function renderCell(location, value) {
-  // Select the elCell and set the valuet
+  // Select the elCell and set the value
   var elCell = document.querySelector(`.cell-${location.i}-${location.j}`);
   elCell.innerHTML = value;
 }
@@ -169,16 +167,17 @@ function checkGameWon() {
   return gGame.shownCount === gBoard.length ** 2 - gLevel.mineCount;
 }
 
-function gameOver() {
+function gameOver(isVictory = checkGameWon()) {
   var elBtnNew = document.querySelector('.btn-new');
-  if (!checkGameWon()) {
+  if (!isVictory) {
     elBtnNew.innerText = '🤯';
   } else {
+    elBtnNew.innerText = '😎';
     var newTime = gGame.secsPassed;
     if (gBestTime > newTime || gBestTime === '--') {
-      localStorage.setItem('gBestTime', newTime);
+      localStorage.setItem(`gBestTime${gLevel.size}`, newTime);
+      // localStorage.setItem('gBestTime', newTime);
       displayBestTime();
-      elBtnNew.innerText = '😎';
     }
   }
   gGame.isOn = false;
@@ -187,7 +186,8 @@ function gameOver() {
 }
 
 function chooseLevel(size, mineCount) {
-  if (gTimerInterval) return;
+  if (gTimerInterval || gLevel?.size === size) return;
+
   gLevel = {
     size,
     mineCount,
@@ -195,9 +195,10 @@ function chooseLevel(size, mineCount) {
   if (gGame.livesOn) gGame.lifeCount = mineCount < 3 ? mineCount : 3;
   else gGame.lifeCount = 1;
 
+  displayBestTime();
   gBoard = createBoard(gLevel.size, gLevel.mineCount);
   renderBoard(gBoard, '.board-container');
-  renderLives();
+  if (gGame.lifeCount > 1) renderLives();
 
   return gLevel;
 }
@@ -223,7 +224,7 @@ function showCell(cell, elCell) {
   }
   if (!cell.isMine && !cell.isShown) gGame.shownCount++;
   cell.isShown = true;
-  elCell.classList.add('hit');
+  elCell.classList.add('shown');
 }
 
 function expandShown(board, cellI, cellJ, prevNoMinesCellLocation = '') {
@@ -234,6 +235,8 @@ function expandShown(board, cellI, cellJ, prevNoMinesCellLocation = '') {
       if (j < 0 || j >= board[i].length) continue;
       var cell = board[i][j];
       if (cell.isShown) continue;
+      // If the current cell has 0 mines around it and it's location
+      // is different from the previous 0 mines around cell, expand his neighbours as well
       if (
         !cell.minesAroundCount &&
         (prevNoMinesCellLocation?.cellI !== i ||
@@ -251,9 +254,9 @@ function expandShown(board, cellI, cellJ, prevNoMinesCellLocation = '') {
 }
 
 function startWatch() {
-  gStartTime = Date.now();
+  var startTime = Date.now();
   gTimerInterval = setInterval(function printTime() {
-    var elapsedTime = Date.now() - gStartTime;
+    var elapsedTime = Date.now() - startTime;
     elTimer.innerText = timeToString(elapsedTime);
     gGame.secsPassed++;
   }, 1000);
@@ -264,7 +267,8 @@ function pauseWatch() {
 }
 
 function displayBestTime() {
-  gBestTime = Number(localStorage.getItem('gBestTime')) || '--';
+  gBestTime = localStorage.getItem(`gBestTime${gLevel.size}`) ?? '--';
+  // gBestTime = +localStorage.getItem('gBestTime') || '--';
   elBestTime.innerText = `Best Time:\n${gBestTime} second/s`;
 }
 
@@ -285,10 +289,8 @@ function popHeart(elHeart) {
 }
 
 function renderLives() {
-  const elCheckBox = document.querySelector('.lives input');
   if (!elCheckBox.checked) return;
-  var livesHtmlStr =
-    ' <input onclick="toggleLives(this, event)"  checked type="checkbox" /> Lives: ';
+  var livesHtmlStr = ` <input onclick="toggleLives(this, event)" checked  type="checkbox" /> Lives: `;
   for (var i = 0; i < gGame.lifeCount; i++) {
     livesHtmlStr += `<div class="heart-container life${i}">
     <span class="heart"></span>

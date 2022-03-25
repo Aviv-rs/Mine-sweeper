@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Mine Sweeper 🕹</title>
+    <title>Mine Sweeper</title>
     <link rel="stylesheet" href="css/app.css" />
+    <link rel="shortcut icon" href="images/flag-icon.png" type="image/x-icon" />
   </head>
 
   <body onload="init()">
@@ -18,7 +19,7 @@
     <div>
       <h1>Mine Sweeper <img src="images/mine-icon.png" alt="" /></h1>
       <h2>Choose Level</h2>
-      <button class="btn-lvl" onclick="chooseLevel(4,2)">easy(16)</button>
+      <button class="btn-lvl" onclick="chooseLevel(4,2)">Easy(16)</button>
       <button class="btn-lvl" onclick="chooseLevel(8,12)">
         Intermediate(64)
       </button>
@@ -28,21 +29,27 @@
     <div class="ui">
       <div
         title="Toggle lives, tip: on easy mode you get 2 lives"
-        class="lives"
-      >
-        <input onclick="toggleLives(this, event)" checked type="checkbox" />
-        Lives:
+        class="lives">
+          <input onclick="toggleLives(this, event)" checked type="checkbox" />
+          Lives:
+        </label>
       </div>
       <span class="timer"></span>
       <span class="best-time">Best time:</span>
     </div>
 
+    <div class=""></div>
+    <span class="wall-flag"> <img src="images/wall-flag.png" alt="" /> </span>
+    <span class="wall-flag2"> <img src="images/wall-flag.png" alt="" /> </span>
     <div class="board-container"></div>
+
 
     <script src="js/utils.js"></script>
     <script src="js/game.js"></script>
   </body>
-  <br />
-  <br />
-  <footer>Made by Aviv Roas at coding academy</footer>
+
+  <footer>
+    Made by Aviv Roas at coding academy
+    <img src="images/flag-animated.gif" alt="" />
+  </footer>
 </html>
