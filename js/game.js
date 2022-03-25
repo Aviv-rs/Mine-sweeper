@@ -222,9 +222,10 @@ function showCell(cell, elCell) {
       elCell.style.color = 'yellow';
       break;
   }
+  elCell.classList.add('shown');
+
   if (!cell.isMine && !cell.isShown) gGame.shownCount++;
   cell.isShown = true;
-  elCell.classList.add('shown');
 }
 
 function expandShown(board, cellI, cellJ, prevNoMinesCellLocation = '') {
@@ -313,8 +314,8 @@ function toggleLives(elCheckBox, ev) {
     for (var i = 0; i < gGame.lifeCount; i++) {
       var elHeart = document.querySelector(`.life${i}`);
       popHeart(elHeart);
-      gGame.livesOn = false;
     }
+    gGame.livesOn = false;
     gGame.lifeCount = 1;
   }
 }
