@@ -6,6 +6,7 @@ const flagSound = new Audio('sounds/flag-sound.wav');
 const flagUnmarkSound = new Audio('sounds/flag-sound2.wav');
 const elBestTime = document.querySelector('.best-time');
 const elCheckBox = document.querySelector('.lives input');
+const elHint = document.querySelector('.hint');
 
 var elTimer;
 var gBoard;
@@ -19,6 +20,8 @@ var gGame = {
   secsPassed: 0,
   lifeCount: 2,
   livesOn: true,
+  hintOn: false,
+  hintCount: 3,
 };
 
 var gLevel = chooseLevel(4, 2);
@@ -30,7 +33,11 @@ function init() {
     markedCount: 0,
     secsPassed: 0,
     lifeCount: gLevel.mineCount < 3 ? gLevel.mineCount : 3,
+    hintOn: false,
+    hintCount: 3,
   };
+  elHint.classList.remove('hint-on');
+  elHint.innerText = 'Use hint(3)';
   elTimer = document.querySelector('.timer');
   elTimer.innerText = '00:00 ';
   displayBestTime();
@@ -89,7 +96,6 @@ function setMinesNegsCount(board) {
       var cell = board[i][j];
       if (cell.isMine) continue;
       setMineAroundCount(i, j, board);
-      cell.minesAroundCount = cell.minesAroundCount || '';
     }
   }
 }
@@ -110,7 +116,7 @@ function cellMarked(ev, elCell, i, j) {
   ev.preventDefault();
   var cell = gBoard[i][j];
   if (!gGame.shownCount) gGame.isOn = true;
-  if (cell.isShown || !gGame.isOn) return;
+  if (cell.isShown || !gGame.isOn || gGame.hintOn) return;
   if (!gTimerInterval) startWatch(elTimer);
 
   cell.isMarked = !cell.isMarked;
@@ -136,10 +142,14 @@ function cellClicked(elCell, i, j) {
   }
   if (cell.isMarked || !gGame.isOn || cell.isShown) return;
   if (!gTimerInterval) startWatch(elTimer);
+  if (gGame.hintOn) {
+    renderHint(gBoard, i, j);
+    gGame.hintOn = false;
+    return;
+  }
 
-  showCell(cell, elCell);
+  showCell(cell, elCell, { i, j });
   if (cell.isMine) {
-    renderCell({ i, j }, MINE);
     gGame.lifeCount--;
     var elHeart = document.querySelector(`.life${gGame.lifeCount}`);
     popHeart(elHeart);
@@ -176,7 +186,6 @@ function gameOver(isVictory = checkGameWon()) {
     var newTime = gGame.secsPassed;
     if (gBestTime > newTime || gBestTime === '--') {
       localStorage.setItem(`gBestTime${gLevel.size}`, newTime);
-      // localStorage.setItem('gBestTime', newTime);
       displayBestTime();
     }
   }
@@ -203,8 +212,8 @@ function chooseLevel(size, mineCount) {
   return gLevel;
 }
 
-function showCell(cell, elCell) {
-  elCell.innerText = cell.minesAroundCount;
+function showCell(cell, elCell, location) {
+  elCell.innerText = cell.minesAroundCount || '';
   switch (cell.minesAroundCount) {
     case 1:
       elCell.style.color = 'green';
@@ -222,8 +231,12 @@ function showCell(cell, elCell) {
       elCell.style.color = 'yellow';
       break;
   }
+  if (cell.isMine) renderCell(location, MINE);
   elCell.classList.add('shown');
-
+  if (gGame.hintOn) {
+    setTimeout(hideCell, 1000, elCell);
+    return;
+  }
   if (!cell.isMine && !cell.isShown) gGame.shownCount++;
   cell.isShown = true;
 }
@@ -269,7 +282,6 @@ function pauseWatch() {
 
 function displayBestTime() {
   gBestTime = localStorage.getItem(`gBestTime${gLevel.size}`) ?? '--';
-  // gBestTime = +localStorage.getItem('gBestTime') || '--';
   elBestTime.innerText = `Best Time:\n${gBestTime} second/s`;
 }
 
@@ -279,8 +291,7 @@ function showMines(board) {
       var cell = board[i][j];
       if (!cell.isMine || cell.isShown) continue;
       var elCell = document.querySelector(`.cell-${i}-${j}`);
-      showCell(cell, elCell);
-      renderCell({ i, j }, MINE);
+      showCell(cell, elCell, { i, j });
     }
   }
 }
@@ -318,4 +329,33 @@ function toggleLives(elCheckBox, ev) {
     gGame.livesOn = false;
     gGame.lifeCount = 1;
   }
+}
+
+function renderHint(board, cellI, cellJ) {
+  elHint.classList.remove('hint-on');
+  for (var i = cellI - 1; i <= cellI + 1; i++) {
+    if (i < 0 || i >= board.length) continue;
+    for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+      if (j < 0 || j >= board[i].length) continue;
+      var cell = board[i][j];
+      if (cell.isShown) continue;
+
+      var elCell = document.querySelector(`.cell-${i}-${j}`);
+      showCell(cell, elCell, { i, j });
+      setTimeout(hideCell, 500, elCell, { i, j });
+    }
+  }
+}
+
+function turnOnHint(elHint) {
+  if (gGame.hintOn || !gGame.isOn || !gGame.hintCount) return;
+  gGame.hintCount--;
+  elHint.innerText = `Use hint(${gGame.hintCount})`;
+  gGame.hintOn = true;
+  elHint.classList.add('hint-on');
+}
+
+function hideCell(elCell, location) {
+  renderCell(location, '');
+  elCell.classList.remove('shown');
 }

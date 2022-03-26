@@ -27,7 +27,7 @@
     </div>
     <br />
     <div class="ui">
-      <div
+      <div alt = "help"
         title="Toggle lives, tip: on easy mode you get 2 lives"
         class="lives">
           <input onclick="toggleLives(this, event)" checked type="checkbox" />
@@ -37,16 +37,22 @@
       <span class="timer"></span>
       <span class="best-time">Best time:</span>
     </div>
+    <div>
+      <a href="#"  class="tip">  ?<span>Lets you take a short glimpse at a cell and it's neighbours</span></a>
+      <button class = "hint" onclick="turnOnHint(this)"> Use hint(3)</button>
+    </div>
 
     <div class=""></div>
     <span class="wall-flag"> <img src="images/wall-flag.png" alt="" /> </span>
     <span class="wall-flag2"> <img src="images/wall-flag.png" alt="" /> </span>
     <div class="board-container"></div>
 
+    <div class="floor-tile"></div>
 
     <script src="js/utils.js"></script>
     <script src="js/game.js"></script>
   </body>
+
 
   <footer>
     Made by Aviv Roas at coding academy
